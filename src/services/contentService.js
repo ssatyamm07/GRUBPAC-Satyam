@@ -1,4 +1,5 @@
 import { Content } from '../models/index.js';
+import { isS3Configured, uploadFileToS3 } from '../utils/s3Upload.js';
 
 export const uploadContent = async (req) => {
   const {
@@ -36,11 +37,28 @@ export const uploadContent = async (req) => {
     throw new Error('start_time must be before end_time');
   }
 
+  let filePath;
+  if (isS3Configured()) {
+    if (!req.file.buffer) {
+      throw new Error('File buffer missing; check multer memory storage for S3');
+    }
+    const { url } = await uploadFileToS3({
+      buffer: req.file.buffer,
+      mimetype: req.file.mimetype,
+      originalname: req.file.originalname,
+    });
+    filePath = url;
+  } else if (req.file.path) {
+    filePath = req.file.path;
+  } else {
+    throw new Error('File path missing; local upload failed');
+  }
+
   const content = await Content.create({
     title,
     subject,
     description,
-    file_path: req.file.path,
+    file_path: filePath,
     file_type: req.file.mimetype,
     file_size: req.file.size,
     uploaded_by: req.user.id,

@@ -1,21 +1,13 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { isS3Configured } from '../utils/s3Upload.js';
 
 const uploadDir = 'uploads/';
 
-if (!fs.existsSync(uploadDir)) {
+if (!isS3Configured() && !fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
-
-const storage = multer.diskStorage({
-  destination: uploadDir,
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const name = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, name + ext);
-  }
-});
 
 const fileFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|gif/;
@@ -29,6 +21,17 @@ const fileFilter = (req, file, cb) => {
 
   cb(null, true);
 };
+
+const diskStorage = multer.diskStorage({
+  destination: uploadDir,
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, name + ext);
+  },
+});
+
+const storage = isS3Configured() ? multer.memoryStorage() : diskStorage;
 
 export const upload = multer({
   storage,

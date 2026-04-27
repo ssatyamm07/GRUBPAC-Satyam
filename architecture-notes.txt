@@ -11,7 +11,8 @@ Each subject can have multiple content items.
 
 3. Upload Handling
 Used multer for file uploads.
-Files are stored locally in uploads/ directory.
+Default: files stored locally in uploads/ directory.
+Optional: when AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and S3_BUCKET are set, files are uploaded to S3 via @aws-sdk/client-s3 and file_path stores the public object URL (optional S3_PUBLIC_BASE_URL for CloudFront).
 Supports JPG, PNG, GIF with max size 10MB.
 
 4. Approval Workflow

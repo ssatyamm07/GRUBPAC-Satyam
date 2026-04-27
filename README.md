@@ -7,7 +7,7 @@ Backend-only service for subject-based educational content: teachers upload mate
 - Node.js (ES modules) + Express 5
 - PostgreSQL + Sequelize ORM
 - JWT (`jsonwebtoken`) + `bcrypt`
-- `multer` for local image uploads (`uploads/`)
+- `multer` for uploads — **local** `uploads/` by default, or **Amazon S3** when `S3_*` / `AWS_*` env vars are set
 
 ## Features Implemented
 
@@ -15,7 +15,7 @@ Backend-only service for subject-based educational content: teachers upload mate
 |------|---------|
 | **Auth** | Register / login; JWT; passwords hashed with bcrypt |
 | **RBAC** | `authenticate` + `authorize`; teacher vs principal routes separated |
-| **Upload** | Teacher-only; JPG / PNG / GIF; max **10 MB**; optional `description`, `start_time` + `end_time` (both required together if used) |
+| **Upload** | Teacher-only; JPG / PNG / GIF; max **10 MB**; optional `description`, `start_time` + `end_time` (both required together if used). **S3:** set AWS credentials + bucket → files go to S3 and `file_path` stores the public URL |
 | **Content window** | `PATCH /api/content/:id/window` — teacher sets/clears ISO `start_time` / `end_time` without re-uploading |
 | **Approval** | Principal: list all / pending, approve, reject (**JSON body must include `"reason"`** for reject) |
 | **Schedule** | Principal: `POST` / `GET` / `DELETE` schedule rows (`rotation_order`, `duration` minutes); links content to subject slots |
@@ -33,7 +33,7 @@ src/
   middlewares/     # auth, role, upload
   models/          # Sequelize models + associations
   config/          # DB connection
-  utils/           # JWT helpers
+  utils/           # JWT helpers, optional S3 upload
 db/
   schema.sql       # PostgreSQL DDL
   seed.sql         # Optional seed data
@@ -53,6 +53,25 @@ DB_USER=postgres
 DB_PASSWORD=postgres
 JWT_SECRET=your-secret
 ```
+
+### Optional: Amazon S3 uploads
+
+If **all** of the following are set, uploads use **in-memory** multer and `PutObject` to S3; `file_path` on `content` is the object URL. If any are missing, the app keeps **local disk** storage under `uploads/`.
+
+```
+AWS_REGION=ap-south-1
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+S3_BUCKET=your-bucket-name
+```
+
+Optional — public URL base if you use **CloudFront** or a custom domain (otherwise the default virtual-hosted URL is built from bucket + region):
+
+```
+S3_PUBLIC_BASE_URL=https://d1234567890.cloudfront.net
+```
+
+**Bucket policy:** objects must be readable by clients that open `file_path` in a browser (e.g. `s3:GetObject` for `public`, or restrict to CloudFront OAC). This repo does not set object ACLs; configure access in AWS.
 
 Use the **same** `PORT` for every Postman request (avoid mixing `5000` and `5006` unless both are intentional).
 
@@ -141,12 +160,10 @@ npm run db:seed
 
 **Demo video:** _add Loom / Drive / YouTube link here_
 
-## Bonus (Not Implemented)
+## Bonus
 
-- Redis cache for `/api/public/live`
-- Rate limiting on public routes
-- S3 file storage
-- Subject analytics, pagination filters
+- **S3 file storage** — implemented (optional via env vars above).
+- Not implemented: Redis cache for `/api/public/live`, rate limiting, subject analytics, pagination filters.
 
 ## Assumptions
 
