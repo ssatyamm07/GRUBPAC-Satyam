@@ -18,7 +18,7 @@ app.use('/api/content', contentRoutes);
 app.use('/api/approval', approvalRoutes);
 app.use('/api/public', publicRoutes);
 app.get('/', (req, res) => {
-  res.send('API running 🚀');
+  res.send('API running');
 });
 
 const PORT = process.env.PORT;
@@ -26,13 +26,13 @@ const PORT = process.env.PORT;
 async function startServer() {
   try {
     await sequelize.authenticate();
-    console.log('✅ DB connected');
+    console.log('DB connected');
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('❌ DB connection failed:', error);
+    console.error('DB connection failed:', error);
   }
 }
 
