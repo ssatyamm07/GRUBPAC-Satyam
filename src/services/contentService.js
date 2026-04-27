@@ -48,8 +48,8 @@ export const uploadContent = async (req) => {
       originalname: req.file.originalname,
     });
     filePath = url;
-  } else if (req.file.path) {
-    filePath = req.file.path;
+  } else if (req.file.filename) {
+    filePath = `uploads/${req.file.filename}`;
   } else {
     throw new Error('File path missing; local upload failed');
   }
