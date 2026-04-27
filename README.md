@@ -18,6 +18,7 @@ Backend service for subject-based content broadcasting in educational workflows.
 - Teacher upload API (JPG/PNG/GIF, max 10MB)
 - Principal approval and rejection workflow
 - Public live API by teacher with schedule-based rotation
+- Principal-managed schedule API (`content_slots` + `schedule` rows)
 - Time-window eligibility (`start_time`, `end_time`)
 
 ## Project Structure
@@ -94,6 +95,11 @@ npm run db:seed
 - `GET /api/approval/pending`
 - `PATCH /api/approval/approve/:id`
 - `PATCH /api/approval/reject/:id`
+
+### Broadcast schedule (principal builds rotation queue)
+- `POST /api/schedule` — principal only; JSON body: `content_id`, `subject`, `rotation_order`, `duration` (minutes). Content must be **approved**; `subject` must match the content’s subject (case-insensitive). Creates `content_slots` row if needed.
+- `GET /api/schedule` — any authenticated user; **teacher** sees only their own content’s schedule rows; **principal** sees all. Optional query: `subject`, `teacherId` (principal filter).
+- `DELETE /api/schedule/:id` — principal only; removes one schedule row.
 
 ### Public Broadcast
 - `GET /api/public/live/:teacherId`

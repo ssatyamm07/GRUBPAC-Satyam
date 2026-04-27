@@ -25,6 +25,12 @@ Implemented dynamic time-based rotation.
 Content is filtered based on:
 - approved status
 - start_time and end_time
+- schedule rows linking content to subject slots (rotation_order, duration)
+
+Principals manage the queue via REST:
+- POST /api/schedule to add a content item to a subject rotation
+- GET /api/schedule to inspect the queue (teachers see only their items)
+- DELETE /api/schedule/:id to remove an entry
 
 Rotation is calculated using modulo arithmetic:
 - total cycle = sum of durations

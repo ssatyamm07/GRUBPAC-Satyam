@@ -6,6 +6,7 @@ import authRoutes from './src/routes/authRoutes.js';
 import contentRoutes from './src/routes/contentRoutes.js';
 import approvalRoutes from './src/routes/approvalRoutes.js';
 import publicRoutes from './src/routes/publicRoutes.js';
+import scheduleRoutes from './src/routes/scheduleRoutes.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/approval', approvalRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/schedule', scheduleRoutes);
 app.get('/', (req, res) => {
   res.send('API running');
 });
