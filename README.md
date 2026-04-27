@@ -1,164 +1,69 @@
-# Content Broadcasting Backend
+# Grubpac
 
-Backend-only service for subject-based educational content: teachers upload material, principals approve or reject it, and students consume **approved, scheduled** content via a **public** live API with time windows and per-subject rotation.
+Teachers upload images. Principals approve or reject and add approved items to a per-subject broadcast schedule. `GET /api/public/live/:teacherId` (optional `?subject=`) returns what should be on screen now: rotation by slot duration, only if the content is approved, scheduled, and inside its `start_time` / `end_time`. Optional React app in `frontend/`.
 
-## Tech Stack
+Stack: Node (ESM), Express 5, PostgreSQL, Sequelize, JWT, bcrypt, multer (disk or S3).
 
-- Node.js (ES modules) + Express 5
-- PostgreSQL + Sequelize ORM
-- JWT (`jsonwebtoken`) + `bcrypt`
-- `multer` for uploads — **local** `uploads/` by default, or **Amazon S3** when `S3_*` / `AWS_*` env vars are set
+## Run it
 
-## Features Implemented
-
-| Area | Details |
-|------|---------|
-| **Auth** | Register / login; JWT; passwords hashed with bcrypt |
-| **RBAC** | `authenticate` + `authorize`; teacher vs principal routes separated |
-| **Upload** | Teacher-only; JPG / PNG / GIF; max **10 MB**; optional `description`, `start_time` + `end_time` (both required together if used). **S3:** set AWS credentials + bucket → files go to S3 and `file_path` stores the public URL |
-| **Content window** | `PATCH /api/content/:id/window` — teacher sets/clears ISO `start_time` / `end_time` without re-uploading |
-| **Approval** | Principal: list all / pending, approve, reject (**JSON body must include `"reason"`** for reject) |
-| **Schedule** | Principal: `POST` / `GET` / `DELETE` schedule rows (`rotation_order`, `duration` minutes); links content to subject slots |
-| **Public live** | `GET /api/public/live/:teacherId` optional `?subject=`; approved + scheduled + inside window only; rotation by duration; empty → `{ "message": "No content available" }` |
-| **Security** | `User` model default scope excludes `password_hash`; login uses `User.unscoped()` for credential check |
-| **Docs** | `architecture-notes.txt` (assignment requirement) |
-
-## Project Structure
-
-```
-src/
-  controllers/   # HTTP handlers
-  routes/          # Route definitions + middleware chains
-  services/        # Business logic
-  middlewares/     # auth, role, upload
-  models/          # Sequelize models + associations
-  config/          # DB connection
-  utils/           # JWT helpers, optional S3 upload
-db/
-  schema.sql       # PostgreSQL DDL
-  seed.sql         # Optional seed data
-scripts/           # db:reset, db:seed
-```
-
-## Environment Variables
-
-Create `.env` in the project root. See **`.env.example`** for every variable with comments.
+**API** (repo root):
 
 ```bash
 cp .env.example .env
-# edit .env
-```
+# PORT, DB_* or DATABASE_URL, JWT_SECRET (use DB_PASS for local DB password)
 
-Minimum variables: `PORT`, `DB_*`, `JWT_SECRET`. The Sequelize config uses **`DB_PASS`** (not `DB_PASSWORD`).
-
-### Optional: Amazon S3 uploads
-
-If **all** of the following are set, uploads use **in-memory** multer and `PutObject` to S3; `file_path` on `content` is the object URL. If any are missing, the app keeps **local disk** storage under `uploads/`. (Same keys are listed in `.env.example`.)
-
-- `AWS_REGION`
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `S3_BUCKET`
-
-Optional — public URL base if you use **CloudFront** or a custom domain: `S3_PUBLIC_BASE_URL` (no trailing slash).
-
-**Bucket policy:** objects must be readable by clients that open `file_path` in a browser (e.g. `s3:GetObject` for `public`, or restrict to CloudFront OAC). This repo does not set object ACLs; configure access in AWS.
-
-Use the **same** `PORT` for every Postman request (avoid mixing `5000` and `5006` unless both are intentional).
-
-## Setup
-
-```bash
 npm install
 npm run db:reset
-npm run db:seed    # optional; requires Docker Postgres if using default script
-npm run dev
+npm run db:seed   # optional
+npm run dev       # listens on PORT from .env
 ```
 
-### Docker (Postgres)
+**UI:**
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+Vite uses port 5173 and proxies `/api` to Express. Start the API first. If the API port differs from your root `.env` `PORT`, set `VITE_API_PROXY_TARGET` or `VITE_API_BASE` in `frontend/.env`.
+
+**Docker Postgres:**
 
 ```bash
 docker compose up -d
 npm run db:reset
-npm run db:seed
 ```
 
-## End-to-End Flow (Getting Live Content)
+**Render:** In the dashboard use Blueprint from `render.yaml`, or create a Web Service with build `npm install`, start `npm start`, and env `DATABASE_URL` from your Render Postgres. Set `JWT_SECRET` yourself. After Postgres exists, run once (Shell with the same `DATABASE_URL`, or from your laptop): `npm run db:apply-schema`.
 
-1. **Register** principal and teacher → **login** each → save **full** JWT (`eyJ...` three segments).
-2. **Teacher** `POST /api/content/upload` (multipart: `title`, `subject`, `file`; optional `start_time`, `end_time`).
-3. **Principal** `PATCH /api/approval/approve/:id`.
-4. If times are missing: **Teacher** `PATCH /api/content/:id/window` with ISO `start_time` / `end_time` bracketing **now** (UTC).
-5. **Principal** `POST /api/schedule` with `content_id`, `subject` (must match content subject), `rotation_order`, `duration`.
-6. **Public** `GET /api/public/live/:teacherId?subject=<normalized subject>` — `:teacherId` = content’s `uploaded_by` user id.
+## Layout
 
-## API Reference
+```
+src/routes  src/controllers  src/services  src/models  src/middlewares  src/config  src/utils
+db/schema.sql  db/seed.sql
+frontend/
+```
 
-### Auth
+## Flow
 
-| Method | Path | Body |
-|--------|------|------|
-| POST | `/api/auth/register` | `{ "name", "email", "password", "role": "teacher" \| "principal" }` |
-| POST | `/api/auth/login` | `{ "email", "password" }` |
+1. `POST /api/auth/register` and `POST /api/auth/login` for teacher and principal; send `Authorization: Bearer <jwt>` on protected routes.
+2. Teacher: `POST /api/content/upload` (multipart: `title`, `subject`, `file`; optional description, `start_time`, `end_time`).
+3. Principal: `PATCH /api/approval/approve/:id`.
+4. If needed: teacher `PATCH /api/content/:id/window` with ISO times including now (UTC).
+5. Principal: `POST /api/schedule` with `content_id`, `subject`, `rotation_order`, `duration` (minutes).
+6. Public: `GET /api/public/live/:teacherId`, or `GET /api/public/live?teacher=...`, or list teachers / subjects via `GET /api/public/teachers` and `GET /api/public/teachers/:teacherId/subjects`.
 
-### Teacher (Bearer: teacher token)
+Uploads: JPG, PNG, GIF, max 10 MB. Empty live: `{ "message": "No content available" }` when rules are not met.
 
-| Method | Path | Notes |
-|--------|------|--------|
-| POST | `/api/content/upload` | `multipart/form-data`: `title`, `subject`, `file`; optional `description`, `start_time`, `end_time` |
-| GET | `/api/content/my` | List own uploads |
-| PATCH | `/api/content/:id/window` | JSON: `{ "start_time", "end_time" }` ISO or both `null` to clear |
+## API
 
-### Principal (Bearer: principal token)
+Base path `/api`. Bearer required except public routes below.
 
-| Method | Path | Notes |
-|--------|------|--------|
-| GET | `/api/approval/all` | All content |
-| GET | `/api/approval/pending` | Pending only |
-| PATCH | `/api/approval/approve/:id` | Pending → approved |
-| PATCH | `/api/approval/reject/:id` | JSON: `{ "reason": "..." }` (required) |
-| POST | `/api/schedule` | JSON: `{ "content_id", "subject", "rotation_order", "duration" }` — content must be **approved** |
-| GET | `/api/schedule` | Optional `?subject=&teacherId=` (principal) |
-| DELETE | `/api/schedule/:id` | Remove schedule row |
+**Auth:** `POST /api/auth/register`, `POST /api/auth/login`
 
-### Public (no auth)
+**Teacher:** `POST /api/content/upload`, `GET /api/content/my`, `PATCH /api/content/:id/window`
 
-| Method | Path | Notes |
-|--------|------|--------|
-| GET | `/api/public/live/:teacherId` | Optional `?subject=maths` |
+**Principal:** `GET /api/approval/all`, `GET /api/approval/pending`, `PATCH /api/approval/approve/:id`, `PATCH /api/approval/reject/:id` (body `{ "reason" }`), `POST /api/schedule`, `GET /api/schedule`, `DELETE /api/schedule/:id`
 
-**Assignment wording** uses `/content/live/:teacherId`; this repo exposes **`/api/public/live/:teacherId`**.
+**Public:** `GET /api/public/teachers`, `GET /api/public/teachers/:teacherId/subjects`, `GET /api/public/live/:teacherId`, `GET /api/public/live?teacher=...`
 
-## Postman Tips
-
-- Paste the **entire** login `token` into Bearer (not only the last segment).
-- Reject: **Body → raw → JSON** `{ "reason": "..." }` plus `Content-Type: application/json`.
-- Upload: **Body → form-data**; add `start_time` / `end_time` as **Text** rows if needed.
-- If you see **403** on principal routes, response JSON includes your token’s role; use principal login token.
-
-## Submission Checklist (External)
-
-- [ ] Public GitHub repository
-- [ ] This README + `architecture-notes.txt`
-- [ ] Demo video (3–7 min) — add link below
-- [ ] Postman collection or Swagger — add link below
-- [ ] Deployment URL (or state “runs locally only”)
-- [ ] Submit via the organizer’s Google Form
-
-**Postman collection:** _add your published link here_
-
-**Deployment:** _add your URL here_
-
-**Demo video:** _add Loom / Drive / YouTube link here_
-
-## Bonus
-
-- **S3 file storage** — implemented (optional via env vars above).
-- Not implemented: Redis cache for `/api/public/live`, rate limiting, subject analytics, pagination filters.
-
-## Assumptions
-
-- Live eligibility requires **both** `start_time` and `end_time` on content and **now** inside that range.
-- Live requires at least one **schedule** row for that content; approval alone is not enough.
-- Supported upload types are **JPG, PNG, GIF** only (per assignment).
-- Invalid teacher id on public live → `{ "message": "No content available" }` (not a hard error).
+More detail: `architecture-notes.txt`.

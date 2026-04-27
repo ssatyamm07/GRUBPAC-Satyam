@@ -6,6 +6,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "db:apply-schema": "node scripts/applySchema.js",
     "db:reset": "node scripts/dbReset.js",
     "db:seed": "node scripts/dbSeed.js",
     "dev": "nodemon server.js"
