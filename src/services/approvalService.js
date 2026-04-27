@@ -1,7 +1,14 @@
-import { Content } from '../models/index.js';
+import { Content, User } from '../models/index.js';
+
+const teacherInclude = {
+  model: User,
+  as: 'Teacher',
+  attributes: ['id', 'name', 'email'],
+};
 
 export const getAllContent = async () => {
   return Content.findAll({
+    include: [teacherInclude],
     order: [['created_at', 'DESC']],
   });
 };
@@ -9,6 +16,7 @@ export const getAllContent = async () => {
 export const getPendingContent = async () => {
   return Content.findAll({
     where: { status: 'pending' },
+    include: [teacherInclude],
     order: [['created_at', 'DESC']],
   });
 };

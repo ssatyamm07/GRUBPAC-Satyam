@@ -1,4 +1,7 @@
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import sequelize from './src/config/database.js';
 import './src/models/index.js';
@@ -10,9 +13,18 @@ import scheduleRoutes from './src/routes/scheduleRoutes.js';
 
 dotenv.config();
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const app = express();
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);

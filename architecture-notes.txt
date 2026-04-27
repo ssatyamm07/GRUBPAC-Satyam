@@ -46,6 +46,7 @@ Used relational structure:
 7. Folder Structure
 Followed layered architecture:
 routes -> controllers -> services -> models
+Optional: frontend/ is Vite + React for demo; dev server proxies /api to Express; API uses CORS for browser clients.
 
 8. Middleware Usage
 - authMiddleware -> JWT validation
