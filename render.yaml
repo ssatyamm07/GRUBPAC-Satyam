@@ -1,3 +1,4 @@
+
 services:
   - type: web
     name: GRUBPAC-Satyam
@@ -7,7 +8,9 @@ services:
     startCommand: npm start
     healthCheckPath: /
     envVars:
-      - key: DATABASE_URL
+      - key: postgresql://neondb_owner:npg_4mJRECidqHA3@ep-floral-mud-anhuu619-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+        name: DATABASE_URL  // Render Blueprint: New > Blueprint > connect this repo, then apply.
         sync: false
       - key: JWT_SECRET
+        name: JWT_SECRET
         sync: false
