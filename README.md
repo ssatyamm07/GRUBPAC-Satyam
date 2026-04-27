@@ -42,34 +42,25 @@ scripts/           # db:reset, db:seed
 
 ## Environment Variables
 
-Create `.env` in the project root:
+Create `.env` in the project root. See **`.env.example`** for every variable with comments.
 
+```bash
+cp .env.example .env
+# edit .env
 ```
-PORT=5000
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=grubpac
-DB_USER=postgres
-DB_PASSWORD=postgres
-JWT_SECRET=your-secret
-```
+
+Minimum variables: `PORT`, `DB_*`, `JWT_SECRET`. The Sequelize config uses **`DB_PASS`** (not `DB_PASSWORD`).
 
 ### Optional: Amazon S3 uploads
 
-If **all** of the following are set, uploads use **in-memory** multer and `PutObject` to S3; `file_path` on `content` is the object URL. If any are missing, the app keeps **local disk** storage under `uploads/`.
+If **all** of the following are set, uploads use **in-memory** multer and `PutObject` to S3; `file_path` on `content` is the object URL. If any are missing, the app keeps **local disk** storage under `uploads/`. (Same keys are listed in `.env.example`.)
 
-```
-AWS_REGION=ap-south-1
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-S3_BUCKET=your-bucket-name
-```
+- `AWS_REGION`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `S3_BUCKET`
 
-Optional — public URL base if you use **CloudFront** or a custom domain (otherwise the default virtual-hosted URL is built from bucket + region):
-
-```
-S3_PUBLIC_BASE_URL=https://d1234567890.cloudfront.net
-```
+Optional — public URL base if you use **CloudFront** or a custom domain: `S3_PUBLIC_BASE_URL` (no trailing slash).
 
 **Bucket policy:** objects must be readable by clients that open `file_path` in a browser (e.g. `s3:GetObject` for `public`, or restrict to CloudFront OAC). This repo does not set object ACLs; configure access in AWS.
 
