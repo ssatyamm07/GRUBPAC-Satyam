@@ -26,3 +26,16 @@ export const getMyUploads = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+export const updateContentWindow = async (req, res) => {
+  try {
+    const data = await contentService.updateContentWindow(
+      req.user.id,
+      req.params.id,
+      req.body
+    );
+    res.json(data);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};

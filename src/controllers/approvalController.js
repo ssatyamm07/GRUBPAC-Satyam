@@ -32,9 +32,10 @@ export const approve = async (req, res) => {
 
 export const reject = async (req, res) => {
   try {
+    const reason = req.body?.reason;
     const content = await approvalService.rejectContent(
       req.params.id,
-      req.body.reason
+      reason
     );
     res.json(content);
   } catch (err) {

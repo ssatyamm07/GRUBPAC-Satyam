@@ -59,3 +59,43 @@ export const getMyUploads = async (userId) => {
     order: [['created_at', 'DESC']],
   });
 };
+
+export const updateContentWindow = async (userId, contentId, body) => {
+  const payload = body ?? {};
+  if (!('start_time' in payload) || !('end_time' in payload)) {
+    throw new Error(
+      'Body must include start_time and end_time (ISO 8601 strings), or both null to clear the window'
+    );
+  }
+
+  const { start_time, end_time } = payload;
+
+  if ((start_time != null && end_time == null) || (start_time == null && end_time != null)) {
+    throw new Error('start_time and end_time must both be set or both be null');
+  }
+
+  const content = await Content.findByPk(contentId);
+  if (!content) throw new Error('Content not found');
+  if (content.uploaded_by !== userId) {
+    throw new Error('You can only update your own content');
+  }
+
+  if (start_time == null && end_time == null) {
+    content.start_time = null;
+    content.end_time = null;
+    await content.save();
+    return content;
+  }
+
+  const start = new Date(start_time);
+  const end = new Date(end_time);
+
+  if (Number.isNaN(start.getTime())) throw new Error('Invalid start_time');
+  if (Number.isNaN(end.getTime())) throw new Error('Invalid end_time');
+  if (start >= end) throw new Error('start_time must be before end_time');
+
+  content.start_time = start;
+  content.end_time = end;
+  await content.save();
+  return content;
+};

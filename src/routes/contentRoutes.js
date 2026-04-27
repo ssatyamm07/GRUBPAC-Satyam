@@ -1,5 +1,9 @@
 import express from 'express';
-import { uploadContent, getMyUploads } from '../controllers/contentController.js';
+import {
+  uploadContent,
+  getMyUploads,
+  updateContentWindow,
+} from '../controllers/contentController.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
 import { authorize } from '../middlewares/roleMiddleware.js';
 import { upload } from '../middlewares/uploadMiddleware.js';
@@ -15,5 +19,12 @@ router.post(
 );
 
 router.get('/my', authenticate, authorize('teacher'), getMyUploads);
+
+router.patch(
+  '/:id/window',
+  authenticate,
+  authorize('teacher'),
+  updateContentWindow
+);
 
 export default router;
