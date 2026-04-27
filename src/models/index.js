@@ -10,12 +10,12 @@ import Schedule from './Schedule.js';
 // ======================
 
 // User → Content (uploaded by teacher)
-User.hasMany(Content, { foreignKey: 'uploaded_by' });
-Content.belongsTo(User, { foreignKey: 'uploaded_by' });
+User.hasMany(Content, { foreignKey: 'uploaded_by', as: 'UploadedContents' });
+Content.belongsTo(User, { foreignKey: 'uploaded_by', as: 'Teacher' });
 
 // User → Content (approved by principal)
-User.hasMany(Content, { foreignKey: 'approved_by' });
-Content.belongsTo(User, { foreignKey: 'approved_by' });
+User.hasMany(Content, { foreignKey: 'approved_by', as: 'ApprovedContents' });
+Content.belongsTo(User, { foreignKey: 'approved_by', as: 'Approver' });
 
 // Content → Schedule
 Content.hasMany(Schedule, { foreignKey: 'content_id' });

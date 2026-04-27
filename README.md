@@ -38,6 +38,7 @@ db/
   schema.sql       # PostgreSQL DDL
   seed.sql         # Optional seed data
 scripts/           # db:reset, db:seed
+frontend/          # Vite + React demo UI (optional; see frontend/README.md)
 ```
 
 ## Environment Variables
@@ -74,6 +75,18 @@ npm run db:reset
 npm run db:seed    # optional; requires Docker Postgres if using default script
 npm run dev
 ```
+
+### React demo UI (`frontend/`)
+
+Optional Vite + React app for manual testing:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Opens **http://localhost:5173** and proxies `/api` to **http://localhost:5000**. Run the API first. For a different API port, set `VITE_API_BASE` in `frontend/.env` (see `frontend/.env.example`). **CORS** is enabled on the API for browser access.
 
 ### Docker (Postgres)
 
