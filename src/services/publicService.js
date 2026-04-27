@@ -1,7 +1,6 @@
 import { Op } from 'sequelize';
 import { Content, ContentSlot, Schedule, User } from '../models/index.js';
 
-/** Public roster for live lookup (no passwords). */
 export async function listTeachersForPublic() {
   const rows = await User.findAll({
     where: { role: 'teacher' },
@@ -15,10 +14,6 @@ export async function listTeachersForPublic() {
   }));
 }
 
-/**
- * Resolve a public "teacher" query to a user id.
- * Accepts numeric id, email (contains @), or exact name (case-insensitive).
- */
 export async function resolveTeacherId(teacherRaw) {
   const trimmed = teacherRaw?.trim();
   if (!trimmed) return null;
@@ -52,10 +47,6 @@ export async function resolveTeacherId(teacherRaw) {
   return matches[0].id;
 }
 
-/**
- * Distinct slot subjects that appear on this teacher's approved, scheduled content.
- * Used for the public live lookup subject dropdown (matches getLiveContent filtering).
- */
 export async function listSubjectsForTeacherPublic(teacherId) {
   const id = Number.parseInt(teacherId, 10);
   if (!Number.isInteger(id) || id <= 0) return [];

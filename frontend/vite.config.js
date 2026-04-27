@@ -6,7 +6,6 @@ import react from '@vitejs/plugin-react'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
-/** Dev proxy target: full URL to Express (same host/port you use in Postman). */
 function resolveProxyTarget(mode, frontendDir) {
   const frontendEnv = loadEnv(mode, frontendDir, '')
   const rootEnv = loadEnv(mode, repoRoot, '')

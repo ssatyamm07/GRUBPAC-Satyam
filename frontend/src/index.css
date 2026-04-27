@@ -69,7 +69,6 @@ code {
   color: #334155;
 }
 
-/* ——— Shell ——— */
 .shell {
   display: flex;
   min-height: 100vh;
@@ -348,7 +347,6 @@ code {
   padding-top: 2rem;
 }
 
-/* ——— Page ——— */
 .page {
   max-width: 920px;
   animation: pageIn 0.35s ease-out;
@@ -512,7 +510,6 @@ code {
   font-size: 0.875rem;
 }
 
-/* ——— Panels ——— */
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -619,7 +616,6 @@ code {
   margin: 0;
 }
 
-/* ——— Forms ——— */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -897,7 +893,6 @@ code {
   color: var(--muted);
 }
 
-/* ——— Buttons ——— */
 .btn {
   font: inherit;
   cursor: pointer;
@@ -1009,7 +1004,6 @@ code {
   flex-wrap: wrap;
 }
 
-/* ——— Tables ——— */
 .table-wrap {
   overflow-x: auto;
   margin: 0 -0.35rem;
@@ -1068,7 +1062,6 @@ code {
   white-space: nowrap;
 }
 
-/* ——— Tabs ——— */
 .tabs {
   display: flex;
   flex-wrap: wrap;
@@ -1115,7 +1108,6 @@ code {
   border-color: var(--border-strong);
 }
 
-/* ——— Alerts ——— */
 .alert {
   padding: 0.85rem 1.1rem;
   border-radius: var(--radius-sm);
@@ -1144,7 +1136,6 @@ code {
   vertical-align: baseline;
 }
 
-/* ——— Badges ——— */
 .badge {
   display: inline-block;
   padding: 0.22rem 0.55rem;
@@ -1170,7 +1161,6 @@ code {
   color: #b45309;
 }
 
-/* ——— Modal ——— */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1221,7 +1211,6 @@ code {
   font-weight: 700;
 }
 
-/* ——— Live content ——— */
 .content-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1315,7 +1304,6 @@ code {
   background: #f8fafc;
 }
 
-/* ——— Loading ——— */
 .loading-row {
   display: flex;
   align-items: center;

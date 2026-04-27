@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="page page-center">
         <div className="panel panel-narrow panel-login">
           <p className="text-muted" role="status">
-            Redirecting…
+            Redirecting...
           </p>
         </div>
       </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <span className="spinner" aria-hidden />
-                Signing in…
+                Signing in...
               </>
             ) : (
               'Continue'

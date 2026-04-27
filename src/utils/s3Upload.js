@@ -9,10 +9,6 @@ export const isS3Configured = () =>
       process.env.AWS_SECRET_ACCESS_KEY?.trim()
   );
 
-/**
- * Upload buffer to S3. Bucket should allow public read via policy if clients load URLs directly,
- * or set S3_PUBLIC_BASE_URL to a CloudFront / custom domain that fronts the bucket.
- */
 export const uploadFileToS3 = async ({ buffer, mimetype, originalname }) => {
   if (!isS3Configured()) {
     throw new Error('S3 is not configured (missing env vars)');
