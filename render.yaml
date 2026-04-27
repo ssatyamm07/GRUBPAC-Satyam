@@ -1,23 +1,13 @@
-# Render Blueprint: New > Blueprint > connect this repo, then apply.
-# After first deploy, run once (Shell or local): DATABASE_URL=... npm run db:apply-schema
-# Set JWT_SECRET in the web service Environment tab (Blueprint uses sync: false so you enter it on apply).
-
 services:
   - type: web
-    name: grubpac-api
+    name: GRUBPAC-Satyam
     runtime: node
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: grubpac-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         sync: false
-
-databases:
-  - name: grubpac-db
-    databaseName: grubpac
-    plan: basic-256mb
