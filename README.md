@@ -26,6 +26,8 @@ cd frontend && npm install && npm run dev
 
 Vite uses port 5173 and proxies `/api` to Express. Start the API first. If the API port differs from your root `.env` `PORT`, set `VITE_API_PROXY_TARGET` or `VITE_API_BASE` in `frontend/.env`.
 
+**Vercel + Render:** Repo root `vercel.json` builds `frontend/` and rewrites `/api` and `/uploads` to Render (edit the host if it changes). If Vercel **Root Directory** is `frontend`, only `frontend/vercel.json` is used. Postman and server-to-server calls must use the **Render** URL (e.g. `https://…onrender.com/api/...`), not the Vercel URL.
+
 **Docker Postgres:**
 
 ```bash
