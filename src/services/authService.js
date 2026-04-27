@@ -25,7 +25,7 @@ export const registerUser = async (name, email, password, role) => {
 };
 
 export const loginUser = async (email, password) => {
-  const user = await User.findOne({ where: { email } });
+  const user = await User.unscoped().findOne({ where: { email } });
   if (!user) {
     throw new Error('Invalid email or password');
   }

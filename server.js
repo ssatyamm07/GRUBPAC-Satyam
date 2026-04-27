@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 import sequelize from './src/config/database.js';
 import './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
+import contentRoutes from './src/routes/contentRoutes.js';
+import approvalRoutes from './src/routes/approvalRoutes.js';
+import publicRoutes from './src/routes/publicRoutes.js';
 
 dotenv.config();
 
@@ -11,7 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
-
+app.use('/api/content', contentRoutes);
+app.use('/api/approval', approvalRoutes);
+app.use('/api/public', publicRoutes);
 app.get('/', (req, res) => {
   res.send('API running 🚀');
 });

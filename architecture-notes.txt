@@ -1,0 +1,51 @@
+1. Authentication & RBAC
+Implemented JWT-based authentication using jsonwebtoken.
+Passwords are hashed using bcrypt.
+RBAC is enforced using middleware:
+- Teachers can upload content
+- Principals can approve/reject content
+
+2. Subject-based System Design
+Content is associated with a subject (maths, science).
+Each subject can have multiple content items.
+
+3. Upload Handling
+Used multer for file uploads.
+Files are stored locally in uploads/ directory.
+Supports JPG, PNG, GIF with max size 10MB.
+
+4. Approval Workflow
+Content lifecycle:
+uploaded -> pending -> approved / rejected
+Only principals can approve/reject.
+Rejected content stores rejection reason.
+
+5. Scheduling / Rotation Logic
+Implemented dynamic time-based rotation.
+Content is filtered based on:
+- approved status
+- start_time and end_time
+
+Rotation is calculated using modulo arithmetic:
+- total cycle = sum of durations
+- current time determines active content
+
+6. Database Design
+Used relational structure:
+- Users (teacher/principal)
+- Content
+- Scheduling handled dynamically
+
+7. Folder Structure
+Followed layered architecture:
+routes -> controllers -> services -> models
+
+8. Middleware Usage
+- authMiddleware -> JWT validation
+- roleMiddleware -> RBAC enforcement
+- uploadMiddleware -> file handling
+
+9. Scalability Approach
+- Can integrate Redis caching for live API
+- S3 support for file storage
+- Stateless API for horizontal scaling

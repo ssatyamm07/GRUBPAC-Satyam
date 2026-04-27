@@ -41,6 +41,15 @@ const Content = sequelize.define('Content', {
   approved_by: {
     type: DataTypes.INTEGER,
   },
+  approved_at: {
+    type: DataTypes.DATE,
+  },
+  start_time: {
+    type: DataTypes.DATE,
+  },
+  end_time: {
+    type: DataTypes.DATE,
+  },
 }, {
   tableName: 'content',
   timestamps: false,

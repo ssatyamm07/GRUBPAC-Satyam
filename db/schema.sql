@@ -24,6 +24,8 @@ CREATE TABLE content (
   description TEXT,
   subject TEXT,
   file_path TEXT,
+  file_type TEXT,
+  file_size INT,
   uploaded_by INT,
   status TEXT DEFAULT 'pending',
   rejection_reason TEXT,
