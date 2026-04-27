@@ -148,7 +148,7 @@ export default function PrincipalPortal() {
         {loading ? (
           <div className="loading-row" role="status">
             <span className="spinner" aria-hidden />
-            Loading content…
+            Loading content...
           </div>
         ) : rows.length === 0 ? (
           <div className="empty-state">
@@ -187,7 +187,7 @@ export default function PrincipalPortal() {
                       <span className="table-sub text-muted small">#{row.id}</span>
                     </td>
                     <td>{row.subject}</td>
-                    <td>{row.Teacher?.name ?? '—'}</td>
+                    <td>{row.Teacher?.name ?? '-'}</td>
                     <td>
                       <StatusBadge status={row.status} />
                     </td>
@@ -224,10 +224,10 @@ export default function PrincipalPortal() {
                 onChange={(e) => setRejectId(e.target.value)}
                 required
               >
-                <option value="">Choose a submission…</option>
+                <option value="">Choose a submission...</option>
                 {pendingRows.map((row) => (
                   <option key={row.id} value={String(row.id)}>
-                    {row.title} · {row.subject} ({row.Teacher?.name ?? 'teacher'})
+                    {row.title} | {row.subject} ({row.Teacher?.name ?? 'teacher'})
                   </option>
                 ))}
               </select>
@@ -273,10 +273,10 @@ export default function PrincipalPortal() {
                   }}
                   required
                 >
-                  <option value="">Choose approved content…</option>
+                  <option value="">Choose approved content...</option>
                   {approvedRows.map((row) => (
                     <option key={row.id} value={String(row.id)}>
-                      {row.title} · {row.subject} · {row.Teacher?.name ?? 'teacher'}
+                      {row.title} | {row.subject} | {row.Teacher?.name ?? 'teacher'}
                     </option>
                   ))}
                 </select>

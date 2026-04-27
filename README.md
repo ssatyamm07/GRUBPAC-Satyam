@@ -7,7 +7,7 @@ Backend-only service for subject-based educational content: teachers upload mate
 - Node.js (ES modules) + Express 5
 - PostgreSQL + Sequelize ORM
 - JWT (`jsonwebtoken`) + `bcrypt`
-- `multer` for uploads — **local** `uploads/` by default, or **Amazon S3** when `S3_*` / `AWS_*` env vars are set
+- `multer` for uploads: **local** `uploads/` by default, or **Amazon S3** when `S3_*` / `AWS_*` env vars are set
 
 ## Features Implemented
 
@@ -15,11 +15,11 @@ Backend-only service for subject-based educational content: teachers upload mate
 |------|---------|
 | **Auth** | Register / login; JWT; passwords hashed with bcrypt |
 | **RBAC** | `authenticate` + `authorize`; teacher vs principal routes separated |
-| **Upload** | Teacher-only; JPG / PNG / GIF; max **10 MB**; optional `description`, `start_time` + `end_time` (both required together if used). **S3:** set AWS credentials + bucket → files go to S3 and `file_path` stores the public URL |
-| **Content window** | `PATCH /api/content/:id/window` — teacher sets/clears ISO `start_time` / `end_time` without re-uploading |
+| **Upload** | Teacher-only; JPG / PNG / GIF; max **10 MB**; optional `description`, `start_time` + `end_time` (both required together if used). **S3:** set AWS credentials and bucket so files go to S3 and `file_path` stores the public URL |
+| **Content window** | `PATCH /api/content/:id/window`: teacher sets/clears ISO `start_time` / `end_time` without re-uploading |
 | **Approval** | Principal: list all / pending, approve, reject (**JSON body must include `"reason"`** for reject) |
 | **Schedule** | Principal: `POST` / `GET` / `DELETE` schedule rows (`rotation_order`, `duration` minutes); links content to subject slots |
-| **Public live** | `GET /api/public/live/:teacherId` optional `?subject=`; approved + scheduled + inside window only; rotation by duration; empty → `{ "message": "No content available" }` |
+| **Public live** | `GET /api/public/live/:teacherId` optional `?subject=`; approved + scheduled + inside window only; rotation by duration; empty response `{ "message": "No content available" }` |
 | **Security** | `User` model default scope excludes `password_hash`; login uses `User.unscoped()` for credential check |
 | **Docs** | `architecture-notes.txt` (assignment requirement) |
 
@@ -61,7 +61,7 @@ If **all** of the following are set, uploads use **in-memory** multer and `PutOb
 - `AWS_SECRET_ACCESS_KEY`
 - `S3_BUCKET`
 
-Optional — public URL base if you use **CloudFront** or a custom domain: `S3_PUBLIC_BASE_URL` (no trailing slash).
+Optional public URL base if you use **CloudFront** or a custom domain: `S3_PUBLIC_BASE_URL` (no trailing slash).
 
 **Bucket policy:** objects must be readable by clients that open `file_path` in a browser (e.g. `s3:GetObject` for `public`, or restrict to CloudFront OAC). This repo does not set object ACLs; configure access in AWS.
 
@@ -98,12 +98,12 @@ npm run db:seed
 
 ## End-to-End Flow (Getting Live Content)
 
-1. **Register** principal and teacher → **login** each → save **full** JWT (`eyJ...` three segments).
+1. **Register** principal and teacher, **login** each, save **full** JWT (`eyJ...` three segments).
 2. **Teacher** `POST /api/content/upload` (multipart: `title`, `subject`, `file`; optional `start_time`, `end_time`).
 3. **Principal** `PATCH /api/approval/approve/:id`.
 4. If times are missing: **Teacher** `PATCH /api/content/:id/window` with ISO `start_time` / `end_time` bracketing **now** (UTC).
 5. **Principal** `POST /api/schedule` with `content_id`, `subject` (must match content subject), `rotation_order`, `duration`.
-6. **Public** `GET /api/public/live/:teacherId?subject=<normalized subject>` — `:teacherId` = content’s `uploaded_by` user id.
+6. **Public** `GET /api/public/live/:teacherId?subject=<normalized subject>` where `:teacherId` is the content `uploaded_by` user id.
 
 ## API Reference
 
@@ -128,9 +128,9 @@ npm run db:seed
 |--------|------|--------|
 | GET | `/api/approval/all` | All content |
 | GET | `/api/approval/pending` | Pending only |
-| PATCH | `/api/approval/approve/:id` | Pending → approved |
+| PATCH | `/api/approval/approve/:id` | Pending to approved |
 | PATCH | `/api/approval/reject/:id` | JSON: `{ "reason": "..." }` (required) |
-| POST | `/api/schedule` | JSON: `{ "content_id", "subject", "rotation_order", "duration" }` — content must be **approved** |
+| POST | `/api/schedule` | JSON: `{ "content_id", "subject", "rotation_order", "duration" }`; content must be **approved** |
 | GET | `/api/schedule` | Optional `?subject=&teacherId=` (principal) |
 | DELETE | `/api/schedule/:id` | Remove schedule row |
 
@@ -145,16 +145,16 @@ npm run db:seed
 ## Postman Tips
 
 - Paste the **entire** login `token` into Bearer (not only the last segment).
-- Reject: **Body → raw → JSON** `{ "reason": "..." }` plus `Content-Type: application/json`.
-- Upload: **Body → form-data**; add `start_time` / `end_time` as **Text** rows if needed.
+- Reject: **Body** as **raw JSON** `{ "reason": "..." }` plus `Content-Type: application/json`.
+- Upload: **Body** as **form-data**; add `start_time` / `end_time` as **Text** rows if needed.
 - If you see **403** on principal routes, response JSON includes your token’s role; use principal login token.
 
 ## Submission Checklist (External)
 
 - [ ] Public GitHub repository
 - [ ] This README + `architecture-notes.txt`
-- [ ] Demo video (3–7 min) — add link below
-- [ ] Postman collection or Swagger — add link below
+- [ ] Demo video (3-7 min); add link below
+- [ ] Postman collection or Swagger; add link below
 - [ ] Deployment URL (or state “runs locally only”)
 - [ ] Submit via the organizer’s Google Form
 
@@ -166,7 +166,7 @@ npm run db:seed
 
 ## Bonus
 
-- **S3 file storage** — implemented (optional via env vars above).
+- **S3 file storage** is implemented (optional via env vars above).
 - Not implemented: Redis cache for `/api/public/live`, rate limiting, subject analytics, pagination filters.
 
 ## Assumptions
@@ -174,4 +174,4 @@ npm run db:seed
 - Live eligibility requires **both** `start_time` and `end_time` on content and **now** inside that range.
 - Live requires at least one **schedule** row for that content; approval alone is not enough.
 - Supported upload types are **JPG, PNG, GIF** only (per assignment).
-- Invalid teacher id on public live → `{ "message": "No content available" }` (not a hard error).
+- Invalid teacher id on public live returns `{ "message": "No content available" }` (not a hard error).

@@ -96,7 +96,7 @@ export default function PublicLivePage() {
       <header className="page-header">
         <p className="eyebrow">Public</p>
         <h1>Live broadcast</h1>
-        <p className="text-muted">What’s on air for a teacher right now (optionally filtered by subject).</p>
+        <p className="text-muted">What is on air for a teacher right now (optionally filtered by subject).</p>
       </header>
 
       <section className="panel panel-live-lookup">
@@ -130,7 +130,7 @@ export default function PublicLivePage() {
                 disabled={teachersLoading || teachers.length === 0}
               >
                 <option value="">
-                  {teachersLoading ? 'Loading teachers…' : teachers.length === 0 ? 'No teachers in roster' : 'Choose a teacher…'}
+                  {teachersLoading ? 'Loading teachers...' : teachers.length === 0 ? 'No teachers in roster' : 'Choose a teacher...'}
                 </option>
                 {teacherLabels.map((t) => (
                   <option key={t.id} value={String(t.id)}>
@@ -149,9 +149,9 @@ export default function PublicLivePage() {
               >
                 <option value="">
                   {!teacherId
-                    ? 'Choose a teacher first…'
+                    ? 'Choose a teacher first...'
                     : subjectsLoading
-                      ? 'Loading subjects…'
+                      ? 'Loading subjects...'
                       : 'All subjects (full rotation)'}
                 </option>
                 {subjects.map((s) => (
@@ -161,7 +161,7 @@ export default function PublicLivePage() {
                 ))}
               </select>
               <span className="field-hint">
-                Subjects come from this teacher’s schedule. Leave as “All subjects” to use the full rotation.
+                {`Subjects come from this teacher's schedule. Leave as "All subjects" to use the full rotation.`}
               </span>
             </label>
             <div className="live-submit-cell">
@@ -170,7 +170,7 @@ export default function PublicLivePage() {
                 className="btn btn-primary btn-live-submit"
                 disabled={loading || teachersLoading || teachers.length === 0}
               >
-                {loading ? 'Loading…' : 'Show now'}
+                {loading ? 'Loading...' : 'Show now'}
               </button>
             </div>
           </div>

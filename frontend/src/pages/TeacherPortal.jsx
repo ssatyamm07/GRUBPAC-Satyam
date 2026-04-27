@@ -254,7 +254,7 @@ export default function TeacherPortal() {
                     : 'Drop an image here, or click to choose a file from your device'}
                 </span>
               </div>
-              <span className="field-hint">JPG, PNG, or GIF · maximum 10 MB.</span>
+              <span className="field-hint">JPG, PNG, or GIF. Maximum 10 MB.</span>
             </label>
           </fieldset>
 
@@ -276,7 +276,7 @@ export default function TeacherPortal() {
         {loading ? (
           <div className="loading-row" role="status">
             <span className="spinner" aria-hidden />
-            Loading your uploads…
+            Loading your uploads...
           </div>
         ) : items.length === 0 ? (
           <div className="empty-state">
@@ -318,7 +318,7 @@ export default function TeacherPortal() {
                     </td>
                     <td className="text-muted small">
                       {row.start_time && row.end_time
-                        ? `${row.start_time.slice(0, 10)} → ${row.end_time.slice(0, 10)}`
+                        ? `${row.start_time.slice(0, 10)} - ${row.end_time.slice(0, 10)}`
                         : 'Not set'}
                     </td>
                     <td className="table-actions">

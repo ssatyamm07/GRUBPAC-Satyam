@@ -10,7 +10,6 @@ import {
   IconTeacher,
 } from './NavIcons'
 
-/** v2: default is open; old key may have been '0' from a previous session */
 const STORAGE_KEY = 'grubpac-sidebar-expanded-v2'
 
 function readSidebarOpen() {
@@ -37,18 +36,14 @@ export default function AppShell() {
     setSidebarOpen(true)
     try {
       localStorage.setItem(STORAGE_KEY, '1')
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   }, [])
 
   const closeSidebar = useCallback(() => {
     setSidebarOpen(false)
     try {
       localStorage.setItem(STORAGE_KEY, '0')
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   }, [])
 
   return (

@@ -12,7 +12,7 @@ export default function HomePage() {
         <h1>School content, on schedule</h1>
         <p className="hero-lead">
           Teachers upload slides; principals approve and queue them by subject. The live screen always
-          shows the right piece of content for each class—automatically.
+          shows the right piece of content for each class, automatically.
         </p>
         <div className="hero-actions">
           <Link to="/live" className="btn btn-primary">
@@ -53,8 +53,7 @@ export default function HomePage() {
           <div className="feature-step">3</div>
           <h3>Live</h3>
           <p>
-            The public live page picks the current slot from the schedule and respects each item’s
-            visibility window.
+            {`The public live page picks the current slot from the schedule and respects each item's visibility window.`}
           </p>
         </div>
       </div>
